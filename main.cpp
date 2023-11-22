@@ -10,6 +10,10 @@ class game
 private:
     float x1 = 5, y1 = 20, y2 = 20, y3 = 130, x2 = 190, x3 = 5, x, y;
     float x4 = 190, y4 = 130;
+    float i = 0, k = 0;
+    float speed = 0.2;
+    float car_x[6] = {0, 129, 204, 172, 33, 239};
+    float car_speed[6] = {5, 4, 6, 7, 8, 2};
     float x_return_w = 80, y_return_w = 20;
     float x_w = 145, y_w = 40;
     bool touch = false;
@@ -20,12 +24,10 @@ public:
     void Statistics();
     void Return();
     void Rules();
+    void Refresh();
     void Credits();
     void Rectangle(float a, float b, float c, float d);
-    int main();
-} Instance;
-
-/*RETURN BUTTON*/
+};
 
 void game::MainMenu()
 {
@@ -86,6 +88,7 @@ void game::MainMenu()
             {
                 Credits();
             }
+            Sleep(0.01);
         }
     }
 }
@@ -119,14 +122,140 @@ void game::Start()
 {
     /*Get rid of rectangles*/
     LCD.Clear();
+    bool dead = false, check = false, color = false;
 
+    while (!dead) // loop until dead
+    {
+
+        /*Waits for touch and updates screen accordingly*/
+        while (!LCD.Touch(&x, &y))
+        {
+            Refresh();
+        }
+
+        while (LCD.Touch(&x, &y))
+        {
+            if (!color) // Correctly assigns color to replace previous character
+            {
+                LCD.SetFontColor(GREEN);
+                color = true;
+            }
+            else if (color)
+            {
+                LCD.SetFontColor(GRAY);
+                color = false;
+            }
+            LCD.DrawCircle(159, k + 190, 9); // delete character
+            k -= 20;
+            LCD.SetFontColor(BLUE);
+            LCD.DrawCircle(159, k + 19, 9); // new character
+
+            Refresh();
+        }
+        Sleep(.05);
+    }
     /*Say play game*/
     LCD.SetFontColor(RED);
     LCD.WriteAt("Play Game Here", 88, 88);
     Return();
-    
 }
-/*They click start*/
+
+/*moves the screen down*/
+void game::Refresh()
+{
+
+/*builds map initially*/
+    LCD.SetFontColor(GRAY);
+    Rectangle(0, i, 319, 20);
+    LCD.SetFontColor(RED);
+    Rectangle(car_x[0], i, 25, 15);
+    LCD.SetFontColor(GREEN);
+    Rectangle(0, i + 22.5, 319, 20);
+    LCD.SetFontColor(GRAY);
+    Rectangle(0, i + 40, 319, 20);
+    LCD.SetFontColor(RED);
+    Rectangle(car_x[1], i + 42.5, 25, 15);
+    LCD.SetFontColor(GREEN);
+    Rectangle(0, i + 60, 319, 20);
+    LCD.SetFontColor(GRAY);
+    Rectangle(0, i + 80, 319, 20);
+    LCD.SetFontColor(RED);
+    Rectangle(car_x[2], i + 82.5, 25, 15);
+    LCD.SetFontColor(GREEN);
+    Rectangle(0, i + 100, 319, 20);
+    LCD.SetFontColor(GRAY);
+    Rectangle(0, i + 120, 319, 20);
+    LCD.SetFontColor(RED);
+    Rectangle(car_x[3], i + 122.5, 25, 15);
+    LCD.SetFontColor(GREEN);
+    Rectangle(0, i + 140, 319, 20);
+    LCD.SetFontColor(GRAY);
+    Rectangle(0, i + 160, 319, 20);
+    LCD.SetFontColor(RED);
+    Rectangle(car_x[4], i + 162.5, 25, 15);
+    LCD.SetFontColor(GREEN);
+    Rectangle(0, i + 180, 319, 20);
+    LCD.SetFontColor(GRAY);
+    Rectangle(0, i + 200, 319, 20);
+    LCD.SetFontColor(RED);
+    Rectangle(car_x[5], i + 202.5, 25, 15);
+    LCD.SetFontColor(GREEN);
+    Rectangle(0, i + 220, 319, 20);
+
+    LCD.SetFontColor(BLUE);
+    LCD.DrawCircle(159, k + 190, 9);
+
+    i += speed; //Updates location of grass+roads
+    k += speed; //Updates location of character
+    int j;
+
+    for (j = 0; j < 6; j++)
+    {
+        car_x[j] += car_speed[j]; //Updates car location
+    }
+
+    LCD.SetFontColor(GRAY);
+    Rectangle(0, i, 319, 20);
+    LCD.SetFontColor(RED);
+    Rectangle(car_x[0], i, 25, 15);
+    LCD.SetFontColor(GREEN);
+    Rectangle(0, i + 22.5, 319, 20);
+    LCD.SetFontColor(GRAY);
+    Rectangle(0, i + 40, 319, 20);
+    LCD.SetFontColor(RED);
+    Rectangle(car_x[1], i + 42.5, 25, 15);
+    LCD.SetFontColor(GREEN);
+    Rectangle(0, i + 60, 319, 20);
+    LCD.SetFontColor(GRAY);
+    Rectangle(0, i + 80, 319, 20);
+    LCD.SetFontColor(RED);
+    Rectangle(car_x[2], i + 82.5, 25, 15);
+    LCD.SetFontColor(GREEN);
+    Rectangle(0, i + 100, 319, 20);
+    LCD.SetFontColor(GRAY);
+    Rectangle(0, i + 120, 319, 20);
+    LCD.SetFontColor(RED);
+    Rectangle(car_x[3], i + 122.5, 25, 15);
+    LCD.SetFontColor(GREEN);
+    Rectangle(0, i + 140, 319, 20);
+    LCD.SetFontColor(GRAY);
+    Rectangle(0, i + 160, 319, 20);
+    LCD.SetFontColor(RED);
+    Rectangle(car_x[4], i + 162.5, 25, 15);
+    LCD.SetFontColor(GREEN);
+    Rectangle(0, i + 180, 319, 20);
+    LCD.SetFontColor(GRAY);
+    Rectangle(0, i + 200, 319, 20);
+    LCD.SetFontColor(RED);
+    Rectangle(car_x[5], i + 202.5, 25, 15);
+    LCD.SetFontColor(GREEN);
+    Rectangle(0, i + 220, 319, 20);
+
+    LCD.SetFontColor(BLUE);
+    LCD.DrawCircle(159, k + 190, 9);
+}
+
+/*They click Statistics*/
 void game::Statistics()
 {
     /*Get rid of rectangles*/
@@ -134,8 +263,11 @@ void game::Statistics()
 
     /*Show Statistics*/
     LCD.SetFontColor(GREEN);
-    LCD.WriteRC("Longest survival time: ", 3, 1);
-    LCD.WriteRC("Distance Travelled: ", 5, 1);
+    LCD.WriteAt("Max time: ", 3, 10);
+    LCD.WriteAt(x1, 120, 10);
+
+    LCD.WriteAt("Distance Travelled: ", 3, 60);
+    LCD.WriteAt(x2, 230, 60);
 
     // wait for return
     Return();
@@ -145,8 +277,19 @@ void game::Rules()
 {
     LCD.Clear();
 
+    LCD.WriteLine("   Click the top of the\n  screen to go forward");
+    LCD.SetFontColor(PURPLE);
+    LCD.WriteLine("\n\n  Click the bottom of the\n  screen to go down");
+    LCD.SetFontColor(YELLOWGREEN);
+    LCD.WriteLine("\n\n  Click the right of the\n  screen to go right");
+    LCD.SetFontColor(CYAN);
+    LCD.WriteLine("\n\n  Click the left of the\n  screen to go left");
+    LCD.SetFontColor(CRIMSON);
+    LCD.WriteLine("\n\n      Survive");
+
     Return();
 }
+
 void game::Credits()
 {
     /*Get rid of rectangles*/
@@ -158,6 +301,7 @@ void game::Credits()
 
     Return();
 }
+
 void game::Return()
 {
     LCD.SetFontColor(GRAY);
