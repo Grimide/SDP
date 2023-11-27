@@ -5,22 +5,41 @@
 
 #include "FEHLCD.h"
 #include "FEHUtility.h"
+
+class car
+{
+private:
+    float car_x;
+    float car_y;
+    float width;
+    float height;
+
+public:
+    float car_speed;
+    void Collision();
+    void CarMake(float a, float b, float c, float d, float e);
+    void CarMove();
+    void CarInitial();
+};
+
 class game
 {
 private:
     float x1 = 5, y1 = 20, y2 = 20, y3 = 130, x2 = 190, x3 = 5, x, y;
     float x4 = 190, y4 = 130;
-    float i = 0;
-    float speed = 0.2;
-    float y_character = 210;
-    float car_y[6];
-    float car_x[6] = {0, 129, 204, 172, 33, 239};
-    float car_speed[6] = {5, 4, 6, 7, 8, 2};
     float x_return_w = 80, y_return_w = 20;
     float x_w = 145, y_w = 40;
     bool touch = false;
+    float numCar = 6;
+    car vroom[58];
 
 public:
+    float i = 0;
+    float speed = 0.4;
+    float y_character;
+    float x_character;
+    bool dead = false, check = false, color = false;
+
     void MainMenu();
     void Start();
     void Statistics();
@@ -29,11 +48,13 @@ public:
     void Refresh();
     void Credits();
     void Rectangle(float a, float b, float c, float d);
-};
+    void DrawBackground();
+} game1;
 
 void game::MainMenu()
 {
-
+    /*Remake game playable*/
+    dead = false;
     /*Start Rectangle*/
     LCD.Clear();
     LCD.SetFontColor(WHITE);
@@ -97,12 +118,11 @@ void game::MainMenu()
 
 int main()
 {
-    game mine;
     // Clear background
     LCD.SetBackgroundColor(BLACK);
     LCD.Clear();
 
-    mine.MainMenu();
+    game1.MainMenu();
 
     while (1)
     {
@@ -122,29 +142,52 @@ void game::Rectangle(float startX, float startY, float width, float height)
 /*They click start*/
 void game::Start()
 {
+    int p, k;
+    /*initialize*/
+    i = 0;
+    y_character = 150;
+    x_character = 159;
+
     /*Get rid of rectangles*/
     LCD.Clear();
-    bool dead = false, check = false, color = false;
+
+    vroom[0].CarMake(250, i + 2.5, 25, 15, 2);
+    vroom[1].CarMake(64, i + 42.5, 25, 15, 6);
+    vroom[2].CarMake(0, i + 82.5, 25, 15, 3);
+    vroom[3].CarMake(18, i + 122.5, 25, 15, 4);
+    vroom[4].CarMake(185, i + 162.5, 25, 15, 7);
+    vroom[5].CarMake(117, i + 202.5, 25, 15, 3);
+
+    DrawBackground();
+    Sleep(3.0);
 
     while (!dead) // loop until dead
     {
-
+        for (k = 0; k < game1.numCar; k++)
+        {
+            vroom[k].Collision();
+        }
+        if (dead)
+        {
+            break;
+        }
         /*Waits for touch and updates screen accordingly*/
         while (!LCD.Touch(&x, &y))
         {
             Refresh();
-            /*If for death does not work, commenting it out*/
-            /*if (((car_x[0] + 25 <= 184 && car_x[0] + 25 >= 134) && (y_character > car_y[0] && y_character < (car_y[0] + 15))) 
-            || ((car_x[1] + 25 >= 184 && car_x[1] + 25 >= 134) && (y_character > car_y[1] && y_character < (car_y[1] + 15))) 
-            || ((car_x[2] + 25 >= 184 && car_x[2] + 25 >= 134) && (y_character > car_y[2] && y_character < (car_y[2] + 15))) 
-            || ((car_x[3] + 25 >= 184 && car_x[3] + 25 >= 134) && (y_character > car_y[3] && y_character < (car_y[3] + 15))) 
-            || ((car_x[4] + 25 >= 184 && car_x[4] + 25 >= 134) && (y_character > car_y[4] && y_character < (car_y[4] + 15))) 
-            || ((car_x[5] + 25 >= 184 && car_x[5] + 25 >= 134) && (y_character > car_y[5] && y_character < (car_y[5] + 15))))
+            for (p = 0; p < numCar; p++)
             {
-                dead = true;
-            }*/
+                vroom[p].Collision();
+            }
+            if (dead)
+            {
+                break;
+            }
         }
-
+        if (dead)
+        {
+            break;
+        }
         while (LCD.Touch(&x, &y))
         {
         }
@@ -158,12 +201,16 @@ void game::Start()
             LCD.SetFontColor(GRAY);
             color = false;
         }
-        LCD.DrawCircle(159, y_character, 9); // delete character
+        LCD.DrawCircle(x_character, y_character, 9); // delete character
         y_character -= 20;
         LCD.SetFontColor(BLUE);
-        LCD.DrawCircle(159, y_character, 9); // new character
+        LCD.DrawCircle(x_character, y_character, 9); // new character
         int n;
         Refresh();
+        for (k = 0; k < game1.numCar; k++)
+        {
+            vroom[k].Collision();
+        }
     }
     /*Say play game*/
     LCD.Clear();
@@ -175,109 +222,59 @@ void game::Start()
 /*moves the screen down*/
 void game::Refresh()
 {
-    int n;
-    for (n = 0; n < 5; n++)
+    int k;
+
+    DrawBackground();
+
+    for (k = 0; k < numCar; k++)
     {
-        car_y[n + 1] = i + (42.5 + 40 * n);
+        vroom[k].CarInitial();
     }
-    car_y[0] = {i};
-
-    /*builds map initially*/
-
-    LCD.SetFontColor(GRAY);
-    Rectangle(0, i, 319, 20);
-    LCD.SetFontColor(RED);
-    Rectangle(car_x[0], car_y[0], 25, 15);
-    LCD.SetFontColor(GREEN);
-    Rectangle(0, i + 22.5, 319, 20);
-    LCD.SetFontColor(GRAY);
-    Rectangle(0, i + 40, 319, 20);
-    LCD.SetFontColor(RED);
-    Rectangle(car_x[1], car_y[1], 25, 15);
-    LCD.SetFontColor(GREEN);
-    Rectangle(0, i + 60, 319, 20);
-    LCD.SetFontColor(GRAY);
-    Rectangle(0, i + 80, 319, 20);
-    LCD.SetFontColor(RED);
-    Rectangle(car_x[2], car_y[2], 25, 15);
-    LCD.SetFontColor(GREEN);
-    Rectangle(0, i + 100, 319, 20);
-    LCD.SetFontColor(GRAY);
-    Rectangle(0, i + 120, 319, 20);
-    LCD.SetFontColor(RED);
-    Rectangle(car_x[3], car_y[3], 25, 15);
-    LCD.SetFontColor(GREEN);
-    Rectangle(0, i + 140, 319, 20);
-    LCD.SetFontColor(GRAY);
-    Rectangle(0, i + 160, 319, 20);
-    LCD.SetFontColor(RED);
-    Rectangle(car_x[4], car_y[4], 25, 15);
-    LCD.SetFontColor(GREEN);
-    Rectangle(0, i + 180, 319, 20);
-    LCD.SetFontColor(GRAY);
-    Rectangle(0, i + 200, 319, 20);
-    LCD.SetFontColor(RED);
-    Rectangle(car_x[5], car_y[5], 25, 15);
-    LCD.SetFontColor(GREEN);
-    Rectangle(0, i + 220, 319, 20);
-
-    LCD.SetFontColor(BLUE);
-    LCD.DrawCircle(159, y_character, 9);
-
-    i += speed;           // Updates location of grass+roads
-    y_character += speed; // Updates location of character
-    int j;
-
-    for (j = 0; j < 6; j++)
+    for (k = 0; k < game1.numCar; k++)
     {
-        car_x[j] += car_speed[j]; // Updates car location
+        vroom[k].Collision();
     }
-
-    for (n = 0; n < 5; n++)
+    if (!dead)
     {
-        car_y[n + 1] = i + (42.5 + 40 * n);
+
+        i += speed;           // Updates location of grass+roads
+        y_character += speed; // Updates location of character
+        int j;
+
+        if (y_character >= 239)
+        {
+            dead = true;
+        }
+        else if (y_character <= 0)
+        {
+            speed += 0.4;
+            Start();
+            for (j = 0; j < numCar; j++)
+            {
+                vroom[j].car_speed += 0.75;
+            }
+        }
     }
-    car_y[0] = {i};
-
-    LCD.SetFontColor(GRAY);
-    Rectangle(0, i, 319, 20);
-    LCD.SetFontColor(RED);
-    Rectangle(car_x[0], car_y[0], 25, 15);
-    LCD.SetFontColor(GREEN);
-    Rectangle(0, i + 22.5, 319, 20);
-    LCD.SetFontColor(GRAY);
-    Rectangle(0, i + 40, 319, 20);
-    LCD.SetFontColor(RED);
-    Rectangle(car_x[1], car_y[1], 25, 15);
-    LCD.SetFontColor(GREEN);
-    Rectangle(0, i + 60, 319, 20);
-    LCD.SetFontColor(GRAY);
-    Rectangle(0, i + 80, 319, 20);
-    LCD.SetFontColor(RED);
-    Rectangle(car_x[2], car_y[2], 25, 15);
-    LCD.SetFontColor(GREEN);
-    Rectangle(0, i + 100, 319, 20);
-    LCD.SetFontColor(GRAY);
-    Rectangle(0, i + 120, 319, 20);
-    LCD.SetFontColor(RED);
-    Rectangle(car_x[3], car_y[3], 25, 15);
-    LCD.SetFontColor(GREEN);
-    Rectangle(0, i + 140, 319, 20);
-    LCD.SetFontColor(GRAY);
-    Rectangle(0, i + 160, 319, 20);
-    LCD.SetFontColor(RED);
-    Rectangle(car_x[4], car_y[4], 25, 15);
-    LCD.SetFontColor(GREEN);
-    Rectangle(0, i + 180, 319, 20);
-    LCD.SetFontColor(GRAY);
-    Rectangle(0, i + 200, 319, 20);
-    LCD.SetFontColor(RED);
-    Rectangle(car_x[5], car_y[5], 25, 15);
-    LCD.SetFontColor(GREEN);
-    Rectangle(0, i + 220, 319, 20);
-
-    LCD.SetFontColor(BLUE);
-    LCD.DrawCircle(159, y_character, 9);
+    if (!dead)
+    {
+        /*Redraw the map*/
+        DrawBackground();
+        for (k = 0; k < game1.numCar; k++)
+        {
+            vroom[k].Collision();
+        }
+    }
+    if (!dead)
+    {
+        for (k = 0; k < numCar; k++)
+        {
+            vroom[k].CarMove();
+        }
+        for (k = 0; k < game1.numCar; k++)
+        {
+            vroom[k].Collision();
+        }
+    }
 }
 
 /*They click Statistics*/
@@ -296,6 +293,45 @@ void game::Statistics()
 
     // wait for return
     Return();
+}
+
+void game::DrawBackground()
+{
+
+    int k;
+
+    /*builds map initially*/
+    LCD.SetFontColor(GRAY);
+    Rectangle(0, i, 319, 20);
+    LCD.SetFontColor(GREEN);
+    Rectangle(0, i + 20, 319, 20);
+    LCD.SetFontColor(GRAY);
+    Rectangle(0, i + 40, 319, 20);
+    LCD.SetFontColor(GREEN);
+    Rectangle(0, i + 60, 319, 20);
+    LCD.SetFontColor(GRAY);
+    Rectangle(0, i + 80, 319, 20);
+    LCD.SetFontColor(GREEN);
+    Rectangle(0, i + 100, 319, 20);
+    LCD.SetFontColor(GRAY);
+    Rectangle(0, i + 120, 319, 20);
+    LCD.SetFontColor(GREEN);
+    Rectangle(0, i + 140, 319, 20);
+    LCD.SetFontColor(GRAY);
+    Rectangle(0, i + 160, 319, 20);
+    LCD.SetFontColor(GREEN);
+    Rectangle(0, i + 180, 319, 20);
+    LCD.SetFontColor(GRAY);
+    Rectangle(0, i + 200, 319, 20);
+    LCD.SetFontColor(GREEN);
+    Rectangle(0, i + 220, 319, 20);
+
+    for (k = 0; k < numCar; k++)
+    {
+        vroom[k].CarInitial();
+    }
+    LCD.SetFontColor(BLUE);
+    LCD.DrawCircle(x_character, y_character, 9);
 }
 
 void game::Rules()
@@ -329,6 +365,7 @@ void game::Credits()
 
 void game::Return()
 {
+    /*Make return button*/
     LCD.SetFontColor(GRAY);
     Rectangle(200, 200, x_return_w, y_return_w);
     LCD.SetFontColor(WHITE);
@@ -347,4 +384,46 @@ void game::Return()
             }
         }
     }
+}
+
+void car::Collision()
+{
+    if ((game1.x_character >= car_x && game1.x_character <= car_x + 25) && (game1.y_character >= car_y && game1.y_character <= car_y + 15))
+    {
+        game1.dead = true;
+    }
+}
+
+void car::CarInitial()
+{
+    LCD.SetFontColor(RED);
+    game1.Rectangle(car_x, car_y, width, height);
+}
+
+void car::CarMake(float a, float b, float c, float d, float e)
+{
+    car_speed = e;
+    car_x = a;
+    car_y = b;
+    width = c;
+    height = d;
+}
+void car::CarMove()
+{
+    LCD.SetFontColor(GRAY);
+    game1.Rectangle(car_x, car_y, width, height);
+    if (car_x >= 319)
+    {
+        car_x = 0;
+    }
+    if (car_y >= 239)
+    {
+        car_y = 0;
+    }
+    car_x += car_speed;
+    car_y += game1.speed;
+
+    LCD.SetFontColor(RED);
+    game1.Rectangle(car_x, car_y, width, height);
+    Collision();
 }
