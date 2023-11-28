@@ -41,8 +41,9 @@ public:
     float speed = 0.4;
     float y_character;
     float x_character;
-    int stages_cleared = 0;
-    int rows_traveled = 0;
+    int stages_cleared = 0, max_stages_cleared = 0;
+    int last_rows, last_stages;
+    int rows_traveled = 0, max_rows_traveled = 0;
     float side_speed = 20;
     float character_size = 9;
     bool dead = false, check = false, color = false;
@@ -55,10 +56,12 @@ public:
     void Refresh();
     void Credits();
     void ControlButtons();
+    void RulesPage2();
     void Character();
     void Rectangle(float a, float b, float c, float d);
     void DrawBackground();
     void Countdown();
+    void Point_Ticker();
 } game1;
 
 void game::MainMenu()
@@ -271,10 +274,29 @@ void game::Start()
             }
         }
     }
+
+    /*Store new max values*/
+    if (rows_traveled > max_rows_traveled)
+    {
+        max_rows_traveled = rows_traveled;
+    }
+    if (stages_cleared > max_stages_cleared)
+    {
+        max_stages_cleared = stages_cleared;
+    }
+
+    /*for stats page*/
+    last_rows = rows_traveled;
+    last_stages = stages_cleared;
+
+    /*clear memory*/
+    stages_cleared = 0;
+    rows_traveled = 0;
+
     /*Say play game*/
     LCD.Clear();
     LCD.SetFontColor(RED);
-    LCD.WriteAt("Play Game Here", 88, 88);
+    LCD.WriteAt("Game Over", 88, 88);
     Return();
 }
 
@@ -289,6 +311,9 @@ void game::Refresh()
     {
         vroom[k].CarInitial();
     }
+
+    Point_Ticker();
+
     for (k = 0; k < game1.numCar; k++)
     {
         vroom[k].Collision();
@@ -314,6 +339,7 @@ void game::Refresh()
                 vroom[j].car_speed += 0.75;
             }
         }
+        Point_Ticker();
     }
     if (!dead)
     {
@@ -347,11 +373,21 @@ void game::Statistics()
     LCD.SetFontColor(GOLD);
     LCD.WriteAt("Last game:", 95, 10);
     LCD.SetFontColor(GREEN);
-    LCD.WriteAt("Rows traveled > \n\n\n\n", 3, 40);
-    LCD.WriteAt(rows_traveled, 185, 40);
+    LCD.WriteAt("Rows Traveled > \n\n\n\n", 3, 40);
+    LCD.WriteAt(last_rows, 185, 40);
 
-    LCD.WriteAt("Stages Cleared >", 3, 90);
-    LCD.WriteAt(stages_cleared, 197, 90);
+    LCD.WriteAt("Stages Cleared >", 3, 70);
+    LCD.WriteAt(last_stages, 197, 70);
+
+    /*Show all time statistics(this session)*/
+    LCD.SetFontColor(GOLD);
+    LCD.WriteAt("All Time:", 95, 110);
+    LCD.SetFontColor(HOTPINK);
+    LCD.WriteAt("Rows Traveled > \n\n\n\n", 3, 140);
+    LCD.WriteAt(max_rows_traveled, 185, 140);
+
+    LCD.WriteAt("Stages Cleared >", 3, 170);
+    LCD.WriteAt(max_stages_cleared, 197, 170);
 
     // wait for return
     Return();
@@ -395,6 +431,7 @@ void game::DrawBackground()
     Character();
 
     ControlButtons();
+    Point_Ticker();
 }
 
 void game::Countdown()
@@ -429,7 +466,7 @@ void game::Rules()
 {
     LCD.Clear();
 
-    LCD.WriteLine("\n\n\n   Click the up arrow\n       to go forward");
+    LCD.WriteLine("\n\n   Click the up arrow\n       to go forward");
     LCD.SetFontColor(YELLOWGREEN);
     LCD.WriteLine("\n\n   Click the right arrow\n      to go right");
     LCD.SetFontColor(CYAN);
@@ -437,7 +474,48 @@ void game::Rules()
     LCD.SetFontColor(CRIMSON);
     LCD.WriteLine("\n\n        Survive");
 
-    Return();
+    RulesPage2();
+}
+
+void game::RulesPage2()
+{
+
+    bool waitingforReturn = true;
+    LCD.SetFontColor(BLUEVIOLET);
+    Rectangle(20, 200, x_return_w, y_return_w);
+    LCD.SetFontColor(WHITE);
+    LCD.WriteAt("Page 2", 25, 204);
+
+    /*Make return button*/
+    LCD.SetFontColor(GRAY);
+    Rectangle(200, 200, x_return_w, y_return_w);
+    LCD.SetFontColor(WHITE);
+    LCD.WriteAt("Return", 205, 204);
+    bool waitingForReturn = true;
+
+    // wait for return button to be pressed
+    while (waitingForReturn)
+    {
+        while (LCD.Touch(&x, &y))
+        {
+            if (x > 200 && x < 200 + x_return_w && y > 200 && y < 200 + y_return_w)
+            {
+                MainMenu();
+                waitingForReturn = false;
+            }
+            else if (x > 20 && x < 20 + x_return_w && y > 200 && y < 200 + y_return_w)
+            {
+                LCD.Clear();
+                LCD.SetFontColor(TAN);
+                LCD.WriteLine("    Reaching the top \n   Starts a new level\n\n");
+                LCD.SetFontColor(ROYALBLUE);
+                LCD.WriteLine("  Each level moves quicker \n  ");
+                LCD.SetFontColor(DARKGOLDENROD);
+                LCD.WriteLine("   Your score is tracked \n in the top-left corner\n");
+                Return();
+            }
+        }
+    }
 }
 
 void game::Credits()
@@ -496,6 +574,22 @@ void game::ControlButtons()
     LCD.WriteAt("<-", control_leftx - 2, control_leftRighty + 4);
     LCD.WriteAt("^", control_upx + 5.5, control_upy + 2.5);
     LCD.WriteAt("|", control_upx + 5.5, control_upy + 7);
+}
+
+void game::Point_Ticker()
+{
+    LCD.SetFontColor(WHITE);
+    Rectangle(5, 5, 30, 18);
+    if (rows_traveled < 10)
+    {
+        LCD.SetFontColor(BROWN);
+        LCD.WriteAt(rows_traveled, 13.75, 7.5);
+    }
+    else if (rows_traveled < 100)
+    {
+        LCD.SetFontColor(GOLD);
+        LCD.WriteAt(rows_traveled, 7.5, 7.5);
+    }
 }
 
 void car::Collision()
