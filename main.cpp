@@ -5,6 +5,7 @@
 
 #include "FEHLCD.h"
 #include "FEHUtility.h"
+#include <random>
 
 class car
 {
@@ -38,6 +39,8 @@ private:
 
 public:
     float i = 0;
+    int ub=10, lb=0;
+    int top_x = 319;
     float speed = 0.4;
     float y_character;
     float x_character;
@@ -165,13 +168,13 @@ void game::Start()
     /*Get rid of rectangles*/
     LCD.Clear();
 
-    /*make all cars*/
-    vroom[0].CarMake(250, i + 2.5, 25, 15, 2);
-    vroom[1].CarMake(64, i + 42.5, 25, 15, 6);
-    vroom[2].CarMake(0, i + 82.5, 25, 15, 3);
-    vroom[3].CarMake(18, i + 122.5, 25, 15, 4);
-    vroom[4].CarMake(185, i + 162.5, 25, 15, 7);
-    vroom[5].CarMake(117, i + 202.5, 25, 15, 3);
+    /*make all cars with random x and random speeds*/
+    vroom[0].CarMake(rand() % top_x, i + 2.5, 25, 15, rand() % (ub - lb + 1) + lb);
+    vroom[1].CarMake(rand() % top_x, i + 42.5, 25, 15, rand() % (ub - lb + 1) + lb);
+    vroom[2].CarMake(rand() % top_x, i + 82.5, 25, 15, rand() % (ub - lb + 1) + lb);
+    vroom[3].CarMake(rand() % top_x, i + 122.5, 25, 15, rand() % (ub - lb + 1) + lb);
+    vroom[4].CarMake(rand() % top_x, i + 162.5, 25, 15, rand() % (ub - lb + 1) + lb);
+    vroom[5].CarMake(rand() % top_x, i + 202.5, 25, 15, rand() % (ub - lb + 1) + lb);
 
     DrawBackground();
     Countdown();
@@ -440,6 +443,7 @@ void game::Countdown()
     float text_y = 92.5;
     float countdown_x = 140, countdown_y = 80;
     float countdown_size = 40;
+
     LCD.SetFontColor(WHITE);
     Rectangle(countdown_x, countdown_y, countdown_size, countdown_size);
     LCD.SetFontColor(BROWN);
