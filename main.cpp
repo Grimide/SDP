@@ -189,43 +189,54 @@ void game::Start()
 
     if (stages_cleared > 0)
     {
-        /*adds car per level*/
+        /*adds one car per level, remakes other added cars as well*/
         if (stages_cleared == 1)
         {
-            vroom[game1.numCar].CarMake(rand() % top_x, i + 2.5, 25, 15, rand() % (ub - lb + 1) + lb);
-            game1.numCar++;
+            vroom[game1.numCar].CarMake(rand() % top_x, game1.vroom[0].car_y, 25, 15, rand() % (ub - lb + 1) + lb);
             backgroundColor = colors[rand() % (color_top - color_bottom + 1) + color_bottom];
         }
-        else if (stages_cleared == 2)
+        if (stages_cleared == 2)
         {
-            vroom[game1.numCar].CarMake(rand() % top_x, i + 42.5, 25, 15, rand() % (ub - lb + 1) + lb);
-            game1.numCar++;
+            vroom[game1.numCar - 1].CarMake(rand() % top_x, game1.vroom[0].car_y, 25, 15, rand() % (ub - lb + 1) + lb);
+            vroom[game1.numCar].CarMake(rand() % top_x, game1.vroom[1].car_y, 25, 15, rand() % (ub - lb + 1) + lb);
             backgroundColor = colors[rand() % (color_top - color_bottom + 1) + color_bottom];
         }
-        else if (stages_cleared == 3)
+        if (stages_cleared == 3)
         {
-            vroom[game1.numCar].CarMake(rand() % top_x, i + 82.5, 25, 15, rand() % (ub - lb + 1) + lb);
-            game1.numCar++;
+            vroom[game1.numCar - 2].CarMake(rand() % top_x, game1.vroom[0].car_y, 25, 15, rand() % (ub - lb + 1) + lb);
+            vroom[game1.numCar - 1].CarMake(rand() % top_x, game1.vroom[1].car_y, 25, 15, rand() % (ub - lb + 1) + lb);
+            vroom[game1.numCar].CarMake(rand() % top_x, game1.vroom[2].car_y, 25, 15, rand() % (ub - lb + 1) + lb);
             backgroundColor = colors[rand() % (color_top - color_bottom + 1) + color_bottom];
         }
-        else if (stages_cleared == 4)
+        if (stages_cleared == 4)
         {
-            vroom[game1.numCar].CarMake(rand() % top_x, i + 122.5, 25, 15, rand() % (ub - lb + 1) + lb);
-            game1.numCar++;
+            vroom[game1.numCar - 3].CarMake(rand() % top_x, game1.vroom[0].car_y, 25, 15, rand() % (ub - lb + 1) + lb);
+            vroom[game1.numCar - 2].CarMake(rand() % top_x, game1.vroom[1].car_y, 25, 15, rand() % (ub - lb + 1) + lb);
+            vroom[game1.numCar - 1].CarMake(rand() % top_x, game1.vroom[2].car_y, 25, 15, rand() % (ub - lb + 1) + lb);
+            vroom[game1.numCar].CarMake(rand() % top_x, game1.vroom[3].car_y, 25, 15, rand() % (ub - lb + 1) + lb);
             backgroundColor = colors[rand() % (color_top - color_bottom + 1) + color_bottom];
         }
-        else if (stages_cleared == 5)
+        if (stages_cleared == 5)
         {
-            vroom[game1.numCar].CarMake(rand() % top_x, i + 162.5, 25, 15, rand() % (ub - lb + 1) + lb);
-            game1.numCar++;
+            vroom[game1.numCar - 4].CarMake(rand() % top_x, game1.vroom[0].car_y, 25, 15, rand() % (ub - lb + 1) + lb);
+            vroom[game1.numCar - 3].CarMake(rand() % top_x, game1.vroom[1].car_y, 25, 15, rand() % (ub - lb + 1) + lb);
+            vroom[game1.numCar - 2].CarMake(rand() % top_x, game1.vroom[2].car_y, 25, 15, rand() % (ub - lb + 1) + lb);
+            vroom[game1.numCar - 1].CarMake(rand() % top_x, game1.vroom[3].car_y, 25, 15, rand() % (ub - lb + 1) + lb);
+            vroom[game1.numCar].CarMake(rand() % top_x, game1.vroom[4].car_y, 25, 15, rand() % (ub - lb + 1) + lb);
             backgroundColor = colors[rand() % (color_top - color_bottom + 1) + color_bottom];
         }
-        else if (stages_cleared == 6)
+        if (stages_cleared == 6)
         {
-            vroom[game1.numCar].CarMake(rand() % top_x, i + 202.5, 25, 15, rand() % (ub - lb + 1) + lb);
-            game1.numCar++;
+            vroom[game1.numCar - 5].CarMake(rand() % top_x, game1.vroom[0].car_y, 25, 15, rand() % (ub - lb + 1) + lb);
+            vroom[game1.numCar - 4].CarMake(rand() % top_x, game1.vroom[1].car_y, 25, 15, rand() % (ub - lb + 1) + lb);
+            vroom[game1.numCar - 3].CarMake(rand() % top_x, game1.vroom[2].car_y, 25, 15, rand() % (ub - lb + 1) + lb);
+            vroom[game1.numCar - 2].CarMake(rand() % top_x, game1.vroom[3].car_y, 25, 15, rand() % (ub - lb + 1) + lb);
+            vroom[game1.numCar - 1].CarMake(rand() % top_x, game1.vroom[4].car_y, 25, 15, rand() % (ub - lb + 1) + lb);
+            vroom[game1.numCar].CarMake(rand() % top_x, game1.vroom[5].car_y, 25, 15, rand() % (ub - lb + 1) + lb);
             backgroundColor = colors[rand() % (color_top - color_bottom + 1) + color_bottom];
         }
+
+        game1.numCar++;
     }
 
     DrawBackground();
