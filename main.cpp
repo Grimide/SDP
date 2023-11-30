@@ -6,16 +6,17 @@
 #include "FEHLCD.h"
 #include "FEHUtility.h"
 #include <random>
+#include <FEHImages.h>
 
 class car
 {
 private:
     float car_x;
-    float car_y;
     float width;
     float height;
 
 public:
+    float car_y;
     float car_speed;
     void Collision();
     void CarMake(float a, float b, float c, float d, float e);
@@ -34,16 +35,19 @@ private:
     float control_upy = 172.5, control_leftRighty = 200;
     float control_size = 25;
     bool touch = false;
-    float numCar = 6;
     car vroom[58];
 
 public:
     float i = 0;
-    int ub=10, lb=0;
+    FEHImage gecko;
+    int ub = 10, lb = 0;
     int top_x = 319;
     float speed = 0.4;
     float y_character;
     float x_character;
+    int numCar = 6;
+    int colors[7] = {GREEN, KHAKI, DARKGREEN, DARKBLUE, TEAL, HONEYDEW, HOTPINK};
+    int backgroundColor = colors[0];
     int stages_cleared = 0, max_stages_cleared = 0;
     int last_rows, last_stages;
     int rows_traveled = 0, max_rows_traveled = 0;
@@ -65,6 +69,7 @@ public:
     void DrawBackground();
     void Countdown();
     void Point_Ticker();
+    void Driving_tips();
 } game1;
 
 void game::MainMenu()
@@ -98,7 +103,7 @@ void game::MainMenu()
 
     /*Crossy Road!*/
     LCD.SetFontColor(GOLDENROD);
-    LCD.WriteAt("Crossy Road", 98, 88);
+    LCD.WriteAt("Chicken Crossing", 75, 88);
 
     while (!LCD.Touch(&x, &y))
     {
@@ -134,11 +139,15 @@ void game::MainMenu()
 
 int main()
 {
+
+    game1.gecko.Open("GeckoFEH.pic");
     // Clear background
     LCD.SetBackgroundColor(BLACK);
     LCD.Clear();
 
     game1.MainMenu();
+
+    game1.gecko.Close();
 
     while (1)
     {
@@ -158,7 +167,8 @@ void game::Rectangle(float startX, float startY, float width, float height)
 /*They click start*/
 void game::Start()
 {
-    int p, k;
+    int p, k, m, j;
+    int color_top = 8, color_bottom = 0;
 
     /*initialize*/
     i = 0;
@@ -169,12 +179,53 @@ void game::Start()
     LCD.Clear();
 
     /*make all cars with random x and random speeds*/
+
     vroom[0].CarMake(rand() % top_x, i + 2.5, 25, 15, rand() % (ub - lb + 1) + lb);
     vroom[1].CarMake(rand() % top_x, i + 42.5, 25, 15, rand() % (ub - lb + 1) + lb);
     vroom[2].CarMake(rand() % top_x, i + 82.5, 25, 15, rand() % (ub - lb + 1) + lb);
     vroom[3].CarMake(rand() % top_x, i + 122.5, 25, 15, rand() % (ub - lb + 1) + lb);
     vroom[4].CarMake(rand() % top_x, i + 162.5, 25, 15, rand() % (ub - lb + 1) + lb);
     vroom[5].CarMake(rand() % top_x, i + 202.5, 25, 15, rand() % (ub - lb + 1) + lb);
+
+    if (stages_cleared > 0)
+    {
+        if (stages_cleared == 1)
+        {
+            vroom[game1.numCar].CarMake(rand() % top_x, i + 2.5, 25, 15, rand() % (ub - lb + 1) + lb);
+            game1.numCar++;
+            backgroundColor = colors[rand() % (color_top - color_bottom + 1) + color_bottom];
+        }
+        else if (stages_cleared == 2)
+        {
+            vroom[game1.numCar].CarMake(rand() % top_x, i + 42.5, 25, 15, rand() % (ub - lb + 1) + lb);
+            game1.numCar++;
+            backgroundColor = colors[rand() % (color_top - color_bottom + 1) + color_bottom];
+        }
+        else if (stages_cleared == 3)
+        {
+            vroom[game1.numCar].CarMake(rand() % top_x, i + 82.5, 25, 15, rand() % (ub - lb + 1) + lb);
+            game1.numCar++;
+            backgroundColor = colors[rand() % (color_top - color_bottom + 1) + color_bottom];
+        }
+        else if (stages_cleared == 4)
+        {
+            vroom[game1.numCar].CarMake(rand() % top_x, i + 122.5, 25, 15, rand() % (ub - lb + 1) + lb);
+            game1.numCar++;
+            backgroundColor = colors[rand() % (color_top - color_bottom + 1) + color_bottom];
+        }
+        else if (stages_cleared == 5)
+        {
+            vroom[game1.numCar].CarMake(rand() % top_x, i + 162.5, 25, 15, rand() % (ub - lb + 1) + lb);
+            game1.numCar++;
+            backgroundColor = colors[rand() % (color_top - color_bottom + 1) + color_bottom];
+        }
+        else if (stages_cleared == 6)
+        {
+            vroom[game1.numCar].CarMake(rand() % top_x, i + 202.5, 25, 15, rand() % (ub - lb + 1) + lb);
+            game1.numCar++;
+            backgroundColor = colors[rand() % (color_top - color_bottom + 1) + color_bottom];
+        }
+    }
 
     DrawBackground();
     Countdown();
@@ -214,7 +265,7 @@ void game::Start()
         {
             if (!color) // Correctly assigns color to replace previous character
             {
-                LCD.SetFontColor(GREEN);
+                LCD.SetFontColor(backgroundColor);
                 color = true;
             }
             else if (color)
@@ -238,7 +289,7 @@ void game::Start()
         {
             if (!color)
             {
-                LCD.SetFontColor(GREEN);
+                LCD.SetFontColor(backgroundColor);
             }
             else if (color)
             {
@@ -260,7 +311,7 @@ void game::Start()
         {
             if (!color)
             {
-                LCD.SetFontColor(GREEN);
+                LCD.SetFontColor(backgroundColor);
             }
             else if (color)
             {
@@ -297,9 +348,9 @@ void game::Start()
     rows_traveled = 0;
 
     /*Say play game*/
-    LCD.Clear();
-    LCD.SetFontColor(RED);
-    LCD.WriteAt("Game Over", 88, 88);
+    Driving_tips();
+    numCar = 6;
+    backgroundColor = colors[0];
     Return();
 }
 
@@ -334,13 +385,10 @@ void game::Refresh()
         }
         else if (y_character <= 0)
         {
-            speed += 0.2;
+            speed += 0.15;
             stages_cleared++;
+
             Start();
-            for (j = 0; j < numCar; j++)
-            {
-                vroom[j].car_speed += 0.75;
-            }
         }
         Point_Ticker();
     }
@@ -375,7 +423,7 @@ void game::Statistics()
     /*Show Statistics*/
     LCD.SetFontColor(GOLD);
     LCD.WriteAt("Last game:", 95, 10);
-    LCD.SetFontColor(GREEN);
+    LCD.SetFontColor(backgroundColor);
     LCD.WriteAt("Rows Traveled > \n\n\n\n", 3, 40);
     LCD.WriteAt(last_rows, 185, 40);
 
@@ -404,27 +452,27 @@ void game::DrawBackground()
     /*builds map initially*/
     LCD.SetFontColor(GRAY);
     Rectangle(0, i, 319, 20);
-    LCD.SetFontColor(GREEN);
+    LCD.SetFontColor(backgroundColor);
     Rectangle(0, i + 20, 319, 20);
     LCD.SetFontColor(GRAY);
     Rectangle(0, i + 40, 319, 20);
-    LCD.SetFontColor(GREEN);
+    LCD.SetFontColor(backgroundColor);
     Rectangle(0, i + 60, 319, 20);
     LCD.SetFontColor(GRAY);
     Rectangle(0, i + 80, 319, 20);
-    LCD.SetFontColor(GREEN);
+    LCD.SetFontColor(backgroundColor);
     Rectangle(0, i + 100, 319, 20);
     LCD.SetFontColor(GRAY);
     Rectangle(0, i + 120, 319, 20);
-    LCD.SetFontColor(GREEN);
+    LCD.SetFontColor(backgroundColor);
     Rectangle(0, i + 140, 319, 20);
     LCD.SetFontColor(GRAY);
     Rectangle(0, i + 160, 319, 20);
-    LCD.SetFontColor(GREEN);
+    LCD.SetFontColor(backgroundColor);
     Rectangle(0, i + 180, 319, 20);
     LCD.SetFontColor(GRAY);
     Rectangle(0, i + 200, 319, 20);
-    LCD.SetFontColor(GREEN);
+    LCD.SetFontColor(backgroundColor);
     Rectangle(0, i + 220, 319, 20);
 
     for (k = 0; k < numCar; k++)
@@ -461,7 +509,7 @@ void game::Countdown()
     Sleep(0.75);
     LCD.SetFontColor(WHITE);
     Rectangle(countdown_x, countdown_y, countdown_size, countdown_size);
-    LCD.SetFontColor(GREEN);
+    LCD.SetFontColor(backgroundColor);
     LCD.WriteAt("GO!", 144, text_y);
     Sleep(0.75);
 }
@@ -513,7 +561,7 @@ void game::RulesPage2()
                 LCD.SetFontColor(TAN);
                 LCD.WriteLine("    Reaching the top \n   Starts a new level\n\n");
                 LCD.SetFontColor(ROYALBLUE);
-                LCD.WriteLine("  Each level moves quicker \n  ");
+                LCD.WriteLine("  Each level moves quicker \n and adds a car   \n ");
                 LCD.SetFontColor(DARKGOLDENROD);
                 LCD.WriteLine("   Your score is tracked \n in the top-left corner\n");
                 Return();
@@ -559,9 +607,11 @@ void game::Return()
 
 void game::Character()
 {
-    LCD.SetFontColor(VIOLET);
+    /*LCD.SetFontColor(VIOLET);
     LCD.DrawCircle(x_character, y_character, 9);
-    LCD.FillCircle(x_character, y_character, 9);
+    LCD.FillCircle(x_character, y_character, 9);*/
+
+    gecko.Draw(x_character, y_character - 9);
 }
 
 void game::ControlButtons()
@@ -594,6 +644,17 @@ void game::Point_Ticker()
         LCD.SetFontColor(GOLD);
         LCD.WriteAt(rows_traveled, 7.5, 7.5);
     }
+}
+
+void game::Driving_tips() // finish later
+{
+    LCD.Clear();
+    LCD.SetFontColor(GOLDENROD);
+    LCD.WriteLine("      Driving Tips:\n");
+    LCD.SetFontColor(WHITE);
+    LCD.WriteLine("\n\n      - Be Sober");
+    LCD.WriteLine("\n\n      - Be Aware");
+    LCD.WriteLine("\n\n      - Be Smart");
 }
 
 void car::Collision()
