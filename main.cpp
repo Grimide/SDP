@@ -189,6 +189,7 @@ void game::Start()
 
     if (stages_cleared > 0)
     {
+        
         if (stages_cleared == 1)
         {
             vroom[game1.numCar].CarMake(rand() % top_x, i + 2.5, 25, 15, rand() % (ub - lb + 1) + lb);
